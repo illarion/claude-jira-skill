@@ -34,41 +34,52 @@ See [INSTALL.md](INSTALL.md) for manual installation options.
 
 ## Setup
 
-Start a Claude Code session and mention a Jira ticket (e.g. `PROJ-1234`). The skill will guide you through authentication via interactive prompts.
+You'll need a Jira API token. Create one at [id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens).
 
-Auth is directory-based via `.jiraskillrc` files — each company directory tree uses its own Jira instance automatically. Add `.jiraskillrc` to your `.gitignore` to avoid committing credentials.
+Then start a Claude Code session and type `/jira login`. The skill will prompt you for your Jira URL, email, and token. Credentials are stored locally in a `.jiraskillrc` file with restricted permissions.
+
+### Multiple projects
+
+During login, you can configure default projects (comma-separated, e.g. `PROJ,CORE,API`). These are used by the team digest to query across all your projects at once.
+
+You can also work with any project your token has access to — just use the project key in your request (e.g. `/jira search open bugs in API`).
+
+### Multiple Jira instances
+
+If you work with different Jira instances, place a separate `.jiraskillrc` (by performing a `/jira login` ) in each directory tree. The skill picks up the nearest one automatically — no manual switching needed.
+
+```
+~/work/
+├── a/               ← .jiraskillrc (a.atlassian.net)
+│   ├── repo-1/
+│   └── repo-2/
+└── b/               ← .jiraskillrc (b.atlassian.net)
+    └── repo-3/
+```
 
 ## Usage
 
-**Fetch a ticket:**
-> Show me PROJ-1234
-
-**Search:**
-> Find all open bugs assigned to me in PROJ
-
-**Create an issue:**
-> Create a bug in PROJ: "Login page crashes on empty password"
-
-**Assign a ticket:**
-> Assign PROJ-1234 to Alice Smith
-
-**Unassign:**
-> Unassign PROJ-1234
-
-**Change status:**
-> Move PROJ-1234 to In Review
-
-**List available transitions:**
-> What transitions are available for PROJ-1234?
-
-**Link issues:**
-> PROJ-1 blocks PROJ-2
-
-**Add a comment:**
-> Comment on PROJ-1234: "Fixed in latest commit"
-
-**Team digest:**
-> Give me a team digest for last week
+| Action | Example |
+|--------|---------|
+| Fetch a ticket | `/jira show me PROJ-1234` |
+| Search | `/jira find all open bugs assigned to me in PROJ` |
+| | `/jira what's overdue in PROJ?` |
+| | `/jira show unassigned tickets in PROJ` |
+| Create an issue | `/jira create a bug in PROJ: "Login page crashes on empty password"` |
+| | `/jira create a high priority task in PROJ: "Update API docs", assign to Alice` |
+| Update an issue | `/jira change the priority of PROJ-1234 to High` |
+| | `/jira set fix version of PROJ-1234 to 1.5.0` |
+| Add a comment | `/jira comment on PROJ-1234: "Fixed in latest commit"` |
+| Assign / unassign | `/jira assign PROJ-1234 to Alice Smith` |
+| | `/jira unassign PROJ-1234` |
+| Change status | `/jira move PROJ-1234 to In Review` |
+| | `/jira what transitions are available for PROJ-1234?` |
+| Link issues | `/jira PROJ-1 blocks PROJ-2` |
+| | `/jira what link types are available?` |
+| Images | `/jira show me the screenshots from PROJ-1234` |
+| | `/jira open screenshot 2` |
+| Team digest | `/jira give me a team digest for last week` |
+| | `/jira what did the team do this week?` |
 
 ## License
 
