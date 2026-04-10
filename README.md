@@ -81,6 +81,28 @@ If you work with different Jira instances, place a separate `.jiraskillrc` (by p
 | Team digest | `/jira give me a team digest for last week` |
 | | `/jira what did the team do this week?` |
 
+## Why this over the official Jira MCP?
+
+The [Atlassian Rovo MCP server](https://www.atlassian.com/platform/remote-mcp-server) gives you basic Jira CRUD — search, create, update. This skill does that and more:
+
+| | Official MCP | This skill |
+|--|:--:|:--:|
+| Search, create, update issues | Yes | Yes |
+| Transitions, assignments, linking | No | Yes |
+| Team digest reports | No | Yes |
+| Developer attribution from changelog | No | Yes |
+| Image attachment analysis | No | Yes |
+| Self-hosted Jira support | No | Yes |
+| Multi-instance auto-switching | No | Yes |
+| ADF formatting handled for you | No | Yes |
+| Zero dependencies (stdlib Python) | - | Yes |
+| Requires admin/OAuth setup | Yes | No |
+| Rate limited by Atlassian plan | Yes | No |
+
+The official MCP is a cloud proxy that requires Atlassian admin to enable Rovo, OAuth 2.1 configuration, and optionally IP allowlisting. This skill runs locally, needs only a personal API token, and works in seconds.
+
+**When to use the official MCP instead:** if you need Confluence or Compass access (not just Jira), your org requires OAuth/SSO and doesn't allow personal API tokens, or corporate policy mandates all API access through Atlassian's managed infrastructure.
+
 ## License
 
 [MIT](LICENSE)
