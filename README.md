@@ -21,7 +21,8 @@ A Claude Code plugin that provides full Jira integration — fetch tickets, sear
 In Claude Code, run:
 
 ```
-/plugin install illarion/claude-jira-skill
+/plugin marketplace add illarion/claude-jira-skill
+/plugin install claude-jira-skill
 ```
 
 See [INSTALL.md](INSTALL.md) for manual installation options.

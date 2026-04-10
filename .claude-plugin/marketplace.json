@@ -1,0 +1,19 @@
+{
+  "name": "claude-jira-skill",
+  "description": "Jira integration for Claude Code",
+  "owner": {
+    "name": "Illarion Kovalchuk",
+    "url": "https://github.com/illarion"
+  },
+  "plugins": [
+    {
+      "name": "claude-jira-skill",
+      "description": "Claude Code skill for Jira — fetch tickets, search with JQL, manage issues, and generate team digest reports.",
+      "version": "1.0.0",
+      "source": {
+        "source": "github",
+        "repo": "illarion/claude-jira-skill"
+      }
+    }
+  ]
+}

@@ -5,7 +5,8 @@
 In Claude Code, run:
 
 ```
-/plugin install illarion/claude-jira-skill
+/plugin marketplace add illarion/claude-jira-skill
+/plugin install claude-jira-skill
 ```
 
 ## Option 2: Manual install
