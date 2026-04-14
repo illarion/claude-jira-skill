@@ -1,6 +1,8 @@
 {
   "name": "claude-jira-skill",
-  "description": "Jira integration for Claude Code",
+  "metadata": {
+    "description": "Jira integration for Claude Code"
+  },
   "owner": {
     "name": "Illarion Kovalchuk",
     "url": "https://github.com/illarion"
