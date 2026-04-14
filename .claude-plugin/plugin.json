@@ -6,10 +6,7 @@
     "name": "Illarion Kovalchuk"
   },
   "homepage": "https://github.com/illarion/claude-jira-skill",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/illarion/claude-jira-skill.git"
-  },
+  "repository": "https://github.com/illarion/claude-jira-skill",
   "license": "MIT",
   "hooks": "./hooks/hooks.json"
 }

@@ -1,8 +1,14 @@
 {
-  "hooks": [
-    {
-      "event": "SessionStart",
-      "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/check-deps.py"
-    }
-  ]
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 ${CLAUDE_PLUGIN_ROOT}/hooks/check-deps.py"
+          }
+        ]
+      }
+    ]
+  }
 }
