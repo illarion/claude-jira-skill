@@ -94,7 +94,6 @@ The [Atlassian Rovo MCP server](https://www.atlassian.com/platform/remote-mcp-se
 | Self-hosted Jira support | No | Yes |
 | Multi-instance auto-switching | No | Yes |
 | ADF formatting handled for you | No | Yes |
-| Zero dependencies (stdlib Python) | - | Yes |
 | Requires admin/OAuth setup | Yes | No |
 | Rate limited by Atlassian plan | Yes | No |
 
