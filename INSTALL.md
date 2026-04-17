@@ -30,6 +30,8 @@ The skill will guide you through authentication via interactive prompts. Follow 
 
 After successful login, there will be `.jiraskillrc` created in this folder
 
+You can repeat this operation in other folder, and associate them with other jira instances
+
 ## Verify
 
 Start a new Claude Code session and type `/jira` — the skill should appear.
