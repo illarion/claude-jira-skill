@@ -21,15 +21,14 @@ ln -s "$(pwd)/claude-jira-skill/skills/jira" ~/.claude/skills/jira
 
 ## Setup
 
-After installing, start a Claude Code session and mention a Jira ticket (e.g. `PROJ-1234`). The skill will guide you through authentication via interactive prompts.
-
-Alternatively, configure manually from your company/project root directory:
-
-```bash
-python3 ~/.claude/skills/jira/jira-auth.py login --name prod --dir /path/to/company
+After installing, go to the root of your work folder, start a Claude Code session and do:
+```
+/jira login
 ```
 
-Follow the prompts to enter your Jira URL, email, and API token.
+The skill will guide you through authentication via interactive prompts. Follow the prompts to enter your Jira URL, email, and API token.
+
+After successful login, there will be `.jiraskillrc` created in this folder
 
 ## Verify
 
