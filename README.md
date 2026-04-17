@@ -38,12 +38,6 @@ You'll need a Jira API token. Create one at [id.atlassian.com/manage-profile/sec
 
 Then start a Claude Code session and type `/jira login`. The skill will prompt you for your Jira URL, email, and token. Credentials are stored locally in a `.jiraskillrc` file with restricted permissions.
 
-### Multiple projects
-
-During login, you can configure default projects (comma-separated, e.g. `PROJ,CORE,API`). These are used by the team digest to query across all your projects at once.
-
-You can also work with any project your token has access to — just use the project key in your request (e.g. `/jira search open bugs in API`).
-
 ### Multiple Jira instances
 
 If you work with different Jira instances, place a separate `.jiraskillrc` (by performing a `/jira login` ) in each directory tree. The skill picks up the nearest one automatically — no manual switching needed.
@@ -56,6 +50,11 @@ If you work with different Jira instances, place a separate `.jiraskillrc` (by p
 └── b/               ← .jiraskillrc (b.atlassian.net)
     └── repo-3/
 ```
+### Multiple projects
+
+During login, you can configure default projects (comma-separated, e.g. `FRONTEND,API,MARKETING`). These are used by the team digest to query across all your projects at once.
+
+You can work with any project your token has access to — just use the project key in your request (e.g. `/jira search open bugs in API2`).
 
 ## Usage
 
