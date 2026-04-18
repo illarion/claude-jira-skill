@@ -39,14 +39,14 @@ Example:
 ## Summary
 
 - **Released**
-  - Core v1.118.0 (Feb 24) — device connectivity and streaming stability fixes, encryption sync, archive search improvements
-  - v1.118.1-v1.118.2 hotfixes (Feb 26-Mar 5) — crash fixes for IVS stats, CDN scheduler, and server allocation; ESC integration removed
-- **Staging** (v1.119.0)
-  - Async/await migration and CDN refactoring
+  - Server v1.2.3 (Feb 12) — user client connectivity and stability fixes,  sync, documents search improvements
+  - v1.2.3, v1.2.4 hotfixes (Feb 26-Mar 5) — crash fixes for stats, scheduler, and monitoring
+- **Staging** (v1.3.0)
+  - Async/await migration and refactoring
   - Connection reliability and status update fixes
-  - Core 2→3 migration API
+  - new API
 - **In Progress**
-  - Modem firmware upgrade, S3 cleanup, cloud allocation hardening (targeting v1.120.0)
+  - Frontend upgrade, cleanup
 ```
 
 This section is strictly factual — no recommendations, no opinions, no action items. Those belong in the Team Performance section only.
