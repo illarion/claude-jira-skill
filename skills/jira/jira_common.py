@@ -57,6 +57,9 @@ def load_credentials_full():
     return config["url"], config["email"], config["token"], projects
 
 
+HTTP_TIMEOUT = 30
+
+
 def _die_on_http_error(e):
     try:
         body = json.loads(e.read())
@@ -78,59 +81,38 @@ def _die_on_http_error(e):
     sys.exit(1)
 
 
-HTTP_TIMEOUT = 30
+def jira_request(jira_url, email, token, method, path, data=None):
+    url = f"{jira_url}{path}"
+    auth = base64.b64encode(f"{email}:{token}".encode()).decode()
+    headers = {
+        "Accept": "application/json",
+        "Authorization": f"Basic {auth}",
+    }
+    body = None
+    if data is not None:
+        headers["Content-Type"] = "application/json"
+        body = json.dumps(data).encode()
+    req = urllib.request.Request(url, data=body, method=method.upper(), headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as resp:
+            raw = resp.read()
+            if not raw:
+                return None
+            return json.loads(raw)
+    except urllib.error.HTTPError as e:
+        _die_on_http_error(e)
 
 
 def jira_get(jira_url, email, token, path):
-    url = f"{jira_url}{path}"
-    auth = base64.b64encode(f"{email}:{token}".encode()).decode()
-    req = urllib.request.Request(url, headers={
-        "Accept": "application/json",
-        "Authorization": f"Basic {auth}",
-    })
-    try:
-        with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as resp:
-            return json.loads(resp.read())
-    except urllib.error.HTTPError as e:
-        _die_on_http_error(e)
+    return jira_request(jira_url, email, token, "GET", path)
 
 
 def jira_post(jira_url, email, token, path, data):
-    url = f"{jira_url}{path}"
-    auth = base64.b64encode(f"{email}:{token}".encode()).decode()
-    body = json.dumps(data).encode()
-    req = urllib.request.Request(url, data=body, method="POST", headers={
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": f"Basic {auth}",
-    })
-    try:
-        with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as resp:
-            raw = resp.read()
-            if not raw:
-                return None
-            return json.loads(raw)
-    except urllib.error.HTTPError as e:
-        _die_on_http_error(e)
+    return jira_request(jira_url, email, token, "POST", path, data)
 
 
 def jira_put(jira_url, email, token, path, data):
-    url = f"{jira_url}{path}"
-    auth = base64.b64encode(f"{email}:{token}".encode()).decode()
-    body = json.dumps(data).encode()
-    req = urllib.request.Request(url, data=body, method="PUT", headers={
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "Authorization": f"Basic {auth}",
-    })
-    try:
-        with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as resp:
-            raw = resp.read()
-            if not raw:
-                return None
-            return json.loads(raw)
-    except urllib.error.HTTPError as e:
-        _die_on_http_error(e)
+    return jira_request(jira_url, email, token, "PUT", path, data)
 
 
 def text_to_adf(text):
@@ -161,25 +143,3 @@ def find_user(jira_url, email, token, display_name):
         identifier = u.get("emailAddress") or u.get("accountId", "")
         print(f"  - {u.get('displayName', '')} ({identifier})", file=sys.stderr)
     sys.exit(1)
-
-
-def jira_request(jira_url, email, token, method, path, data=None):
-    url = f"{jira_url}{path}"
-    auth = base64.b64encode(f"{email}:{token}".encode()).decode()
-    headers = {
-        "Accept": "application/json",
-        "Authorization": f"Basic {auth}",
-    }
-    body = None
-    if data is not None:
-        headers["Content-Type"] = "application/json"
-        body = json.dumps(data).encode()
-    req = urllib.request.Request(url, data=body, method=method.upper(), headers=headers)
-    try:
-        with urllib.request.urlopen(req, timeout=HTTP_TIMEOUT) as resp:
-            raw = resp.read()
-            if not raw:
-                return None
-            return json.loads(raw)
-    except urllib.error.HTTPError as e:
-        _die_on_http_error(e)

@@ -8,6 +8,7 @@ import urllib.parse
 from jira_common import load_credentials, jira_get
 
 DEFAULT_FIELDS = "summary,status,assignee,priority"
+PAGE_SIZE = 50
 
 
 def jira_search(jira_url, email, token, jql, fields, max_results):
@@ -17,7 +18,7 @@ def jira_search(jira_url, email, token, jql, fields, max_results):
     while True:
         query = {
             "jql": jql,
-            "maxResults": min(max_results - len(issues), 50),
+            "maxResults": min(max_results - len(issues), PAGE_SIZE),
             "fields": fields,
         }
         if next_token:
@@ -62,7 +63,7 @@ def main():
     parser = argparse.ArgumentParser(description="Search Jira issues with JQL")
     parser.add_argument("jql", help="JQL query string")
     parser.add_argument("--fields", default=DEFAULT_FIELDS, help="Comma-separated fields")
-    parser.add_argument("--max", type=int, default=50, help="Maximum results")
+    parser.add_argument("--max", type=int, default=PAGE_SIZE, help="Maximum results")
     args = parser.parse_args()
 
     jira_url, email, token = load_credentials()

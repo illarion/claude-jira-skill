@@ -1,12 +1,11 @@
 {
   "name": "claude-jira-skill",
   "description": "Claude Code skill for Jira — fetch tickets, search with JQL, manage issues, and generate team digest reports.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": {
     "name": "Illarion Kovalchuk"
   },
   "homepage": "https://github.com/illarion/claude-jira-skill",
   "repository": "https://github.com/illarion/claude-jira-skill",
-  "license": "MIT",
-  "hooks": "./hooks/hooks.json"
+  "license": "MIT"
 }
