@@ -12,7 +12,7 @@ A Claude Code plugin that provides full Jira integration — fetch tickets, sear
 - **Change status** — transition tickets through workflow states, list available transitions
 - **Link issues** — create relationships between tickets (blocks, relates to, etc.), list available link types
 - **Add comments** — post comments on tickets
-- **Style** — tester-first ticket templates (Bug, Task, Dev-only todo) with word budgets, a collapsed Dev notes block for engineering detail, and light markup that converts to ADF
+- **Style** — tester-first tickets: version first, plain labels, one marked guess, samples to copy, and light markup that converts to ADF
 - **Team digest** — generate period reports with per-developer stats, workload analysis, and categorized summaries
 - **Image support** — downloads and analyzes image attachments, opens in system viewer on request
 - **Custom API calls** — access any Jira REST endpoint via `call_api.py` for advanced use cases

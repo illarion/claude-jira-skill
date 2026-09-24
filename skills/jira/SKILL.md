@@ -9,11 +9,11 @@ All Python scripts referenced below are located in the same directory as this SK
 
 ### IMPORTANT: Jira uses ADF, not wiki markup
 
-Jira Cloud uses ADF (Atlassian Document Format) exclusively. Wiki syntax (`h2.`, `{code}`, `*bold*`) renders as **literal text**, not formatting. The Python scripts (`comment.py`, `create.py`, `update.py`) convert **light markup** to ADF automatically: `###` headings, `-` and `1.` lists, ``` code fences, `**bold**`, `` `code` ``, a `▸ Title` line for a collapsed block, and issue keys become links. Raw ADF JSON is still accepted by `--description-file` for nodes the markup does not cover (tables, panels). See `references/adf-reference.md`.
+Jira Cloud uses ADF (Atlassian Document Format) exclusively. Wiki syntax (`h2.`, `{code}`, `*bold*`) renders as **literal text**, not formatting. The Python scripts (`comment.py`, `create.py`, `update.py`) convert **light markup** to ADF automatically: `###` headings, `-` and `1.` lists, ``` code fences, `**bold**`, `` `code` ``, and issue keys become links. Raw ADF JSON is still accepted by `--description-file` for nodes the markup does not cover (tables, panels). See `references/adf-reference.md`.
 
 ### Writing tickets and comments
 
-Before running `create.py`, `comment.py`, or `update.py` with `--summary` / `--description` / `--description-file`, read `references/writing-style.md` and use its templates. Tickets are read by black-box QA: summary ≤ 70 chars in product language, visible text ≤ ~120 words, engineering detail only inside the collapsed `▸ Dev notes` block, comments ≤ 5 lines. Write the body in light markup to `/tmp/desc.md` and pass `--description-file /tmp/desc.md`. Show the draft (summary + body) in chat, run the checklist from the style guide, then post in the same turn unless the user objects. Report the key and URL.
+Before running `create.py`, `comment.py`, or `update.py` with `--summary` / `--description` / `--description-file`, read `references/writing-style.md`, follow its rules and copy the form of its closest sample. Write the body in light markup to `/tmp/desc.md` and pass `--description-file /tmp/desc.md`. Show the draft (summary + body) in chat, then post in the same turn unless the user objects, and report the key and URL.
 
 ### Credentials — DO NOT ACCESS
 

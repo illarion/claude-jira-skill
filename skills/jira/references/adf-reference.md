@@ -12,7 +12,6 @@ The `comment.py`, `create.py` and `update.py` scripts convert **light markup** t
 | `- item` or `* item` (consecutive lines) | `bulletList` |
 | `1. item`, `2. item` … (consecutive lines) | `orderedList` |
 | ```` ``` ```` … ```` ``` ```` | `codeBlock` (language from the fence, e.g. ```` ```bash ````) |
-| `▸ Title` | `expand` (collapsed block) with that title; everything after it goes inside |
 | blank line | block separator, not emitted |
 | anything else | `paragraph` |
 
@@ -30,19 +29,15 @@ Leading whitespace is ignored, so indented template lines are fine. Lists are fl
 Example:
 
 ```
-Record button on the storefront does nothing when clicked.
+v2.5.333
+The Record button on the storefront does nothing when clicked. Probably related to PROJ-1201.
 
-**Seen on:** v2.5.333
-
-### Steps
+Steps:
 1. Open Menu > Orders > History
-2. Click **Record**
+2. Click "Record"
 
-**Expected:** a new recording starts
-**Actual:** nothing happens
-
-▸ Dev notes
-- order-service, index.php: start() is never reached; see PROJ-1201
+Expected: a new recording starts
+Actual: nothing happens
 ```
 
 ### Raw ADF
@@ -64,10 +59,7 @@ Record button on the storefront does nothing when clicked.
     { "type": "bulletList", "content": [
         {"type": "listItem", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "item"}]}]}
     ]},
-    { "type": "codeBlock", "attrs": {}, "content": [{"type": "text", "text": "code here"}] },
-    { "type": "expand", "attrs": {"title": "Dev notes"}, "content": [
-        {"type": "paragraph", "content": [{"type": "text", "text": "suspected cause"}]}
-    ]}
+    { "type": "codeBlock", "attrs": {}, "content": [{"type": "text", "text": "code here"}] }
   ]
 }
 ```

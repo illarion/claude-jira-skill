@@ -122,7 +122,6 @@ _INLINE_RE = re.compile(r"(\*\*[^*]+\*\*|`[^`]+`|https?://[^\s<>()]+|\b[A-Z][A-Z
 _HEADING_RE = re.compile(r"^(#{1,6}) (.+)$")
 _BULLET_RE = re.compile(r"^[-*] (.+)$")
 _ORDERED_RE = re.compile(r"^(\d+)\. (.+)$")
-_EXPAND_PREFIX = "▸ "
 
 
 def _inline_node(token, jira_url):
@@ -159,12 +158,12 @@ def _code_block(lines, lang):
     return {"type": "codeBlock", "attrs": attrs, "content": content}
 
 
-def _append_list_item(target, current_list, list_type, text, jira_url, order=1):
+def _append_list_item(doc, current_list, list_type, text, jira_url, order=1):
     if current_list is None or current_list["type"] != list_type:
         current_list = {"type": list_type, "content": []}
         if list_type == "orderedList":
             current_list["attrs"] = {"order": order}
-        target.append(current_list)
+        doc.append(current_list)
     item = {"type": "listItem", "content": [_paragraph(text, jira_url)]}
     current_list["content"].append(item)
     return current_list
@@ -174,12 +173,10 @@ def text_to_adf(text, jira_url=None):
     """Convert light markup to ADF.
 
     Supported: # headings, - bullets, 1. ordered items, ``` code fences,
-    "▸ Title" opens a collapsed expand block that runs to the end of the text,
     **bold**, `code`, URLs and issue keys (linked when jira_url is given).
     Plain text becomes paragraphs; blank lines separate blocks.
     """
     doc = []
-    target = doc
     current_list = None
     code = None
     code_lang = ""
@@ -188,7 +185,7 @@ def text_to_adf(text, jira_url=None):
         line = raw.strip()
 
         if code is not None and line.startswith("```"):
-            target.append(_code_block(code, code_lang))
+            doc.append(_code_block(code, code_lang))
             code = None
             continue
 
@@ -206,36 +203,28 @@ def text_to_adf(text, jira_url=None):
             current_list = None
             continue
 
-        if line.startswith(_EXPAND_PREFIX):
-            title = line[len(_EXPAND_PREFIX):].strip()
-            expand = {"type": "expand", "attrs": {"title": title}, "content": []}
-            doc.append(expand)
-            target = expand["content"]
-            current_list = None
-            continue
-
         heading = _HEADING_RE.match(line)
         if heading:
             level = len(heading.group(1))
-            target.append({"type": "heading", "attrs": {"level": level}, "content": _parse_inline(heading.group(2), jira_url)})
+            doc.append({"type": "heading", "attrs": {"level": level}, "content": _parse_inline(heading.group(2), jira_url)})
             current_list = None
             continue
 
         bullet = _BULLET_RE.match(line)
         if bullet:
-            current_list = _append_list_item(target, current_list, "bulletList", bullet.group(1), jira_url)
+            current_list = _append_list_item(doc, current_list, "bulletList", bullet.group(1), jira_url)
             continue
 
         ordered = _ORDERED_RE.match(line)
         if ordered:
-            current_list = _append_list_item(target, current_list, "orderedList", ordered.group(2), jira_url, int(ordered.group(1)))
+            current_list = _append_list_item(doc, current_list, "orderedList", ordered.group(2), jira_url, int(ordered.group(1)))
             continue
 
-        target.append(_paragraph(line, jira_url))
+        doc.append(_paragraph(line, jira_url))
         current_list = None
 
     if code is not None:
-        target.append(_code_block(code, code_lang))
+        doc.append(_code_block(code, code_lang))
 
     return {"version": 1, "type": "doc", "content": doc}
 

@@ -1,195 +1,113 @@
 # Writing tickets and comments
 
-Most tickets end up in the **Test** column, read by **black-box QA**. QA has only what a user has: the product, a browser, a device. No repo, no logs, no context. Every visible line of text has to be something a tester can act on.
+A tester reads this a week from now. They have the build and a browser, no code, no logs. After reading they know what to click.
 
-Good human-written tickets look like this:
+## Rules
 
+1. Write the title the way the user would say it to support: what they did and what they saw. For a bug, product name first, then a colon. For a task, verb + object. No cause, no solution, no code names. Under 70 characters.
+2. For a bug, put the version or build on the first line of the body, exactly as the source gives it. If the source does not give it, ask before writing. Tasks have no version line.
+3. Write one to three sentences on what happened. Then, if the steps are not obvious, list them.
+4. Every sentence is either a step or something you observed. Move any guess about the cause into one sentence that starts with "probably" or "seems like". Delete every other guess.
+5. Text the user sees on screen goes in quotes: "Connecting to Home-5G". A code fence is only for log lines, error output and commands, pasted exactly. Never paraphrase them.
+6. Name what the user sees instead of evaluating it: not "the schedule is unreliable", but "the 06:00 setpoint is skipped and the display still shows it as active".
+7. Labels are plain words with a colon on their own line: Steps:, Expected:, Actual:, Workaround:, Request:. No headings, no bold, no bullet labels.
+8. A task is "Currently X. Please Y." Name the screen or menu item. One sentence of why, only when it is not obvious. Dev-only tasks may contain code, payloads and paths.
+9. One issue per ticket. If the notes contain two, write two tickets.
+10. A question to the developer is fine. A routing note is fine ("if this is app-side, assign to Mobile").
+11. Stay around 100 words for a bug and 40 for a task, not counting logs. If it does not fit, split the ticket.
+12. Never invent a version, a build number, a name or an error text. Take them from the source or ask.
+13. Before posting: delete the closing sentence; delete "not X but Y" and any three-item list you did not need; check every version and error text against the source.
+
+## Comments
+
+Dev to QA: one sentence on what changed, then the build to test on. QA: version on the first line, what you checked, then "Closing ticket" or "Still reproducible". Comment only when you add information. No progress diaries. To correct yourself, edit the original.
+
+## Samples. Copy the form of the closest one and replace the content.
+
+Bug, structured:
 ```
-Position menu text is cut off
-The P in Top Left gets cut off by the region below. Make sure all text has
-enough padding so that it doesn't get obstructed by other UI elements.
-```
-```
-Text should not be cut off anymore, fixed in v2.5.334
-```
+Summary: Hearth T2: active sensor resets to Remote after factory reset
 
-AI-written tickets tend to run 400-1,500 words, with sections like *Where the code is*, *Diagnostic recipes* and *Dead ends*. QA cannot find the test in them. Do not write those.
+2.8.20260914dev-build512
+After factory resetting Hearth T2, the active sensor defaults to Remote instead of Built-in.
 
-## 1. Decide who reads it
+Steps:
+Set Active Sensor to Built-in.
+Factory Reset All Settings.
+Check Active Sensor.
 
-| Ticket goes to | Examples | Needs *How to test*? |
-|---|---|---|
-| **QA** (default) | anything a user can see, hear, or configure; any behaviour change | **Yes** |
-| **Dev-only todo** | CI, build system, test harness, tooling, refactor with no behaviour change | No |
-
-If you are not sure, it goes to QA.
-
-## 2. Budgets
-
-| Part | Limit |
-|---|---|
-| Summary | ≤ 70 chars, product language, the **symptom** not the cause (dev-only todos: plain language) |
-| Visible description | ≤ ~120 words |
-| Dev notes (collapsed) | ≤ ~15 lines |
-| Comment | ≤ 5 lines |
-
-Over budget usually means one of these:
-- the ticket covers two problems: split it;
-- the text is investigation notes: they go in the PR;
-- the text is an open question: it gets its own ticket.
-
-Summary, bad and good:
-
-| ✗ | ✓ |
-|---|---|
-| `Storefront: Record still refused -- index.php:530/535 function…` | `Storefront: Record button does nothing` |
-| `Inventory service publishes a stale order when a database dies - the payment service's gate…` | `Previous order is silently published when database is offline` |
-
-## 3. Templates
-
-Write the body in light markup (see `adf-reference.md`), save it to `/tmp/desc.md`, and pass `--description-file /tmp/desc.md`. The headings come in a fixed order. **Leave a heading out when you have nothing for it.** Never write "N/A".
-
-### Bug
-
-```
-<One sentence: what the user sees go wrong.>
-
-**Seen on:** <version or build>          (or: "Not yet reproduced, found by code reading.")
-
-### Steps
-1. …
-2. …
-
-**Expected:** <one line>
-**Actual:** <one line>
-
-▸ Dev notes
-- …
+Expected: Built-in.
+Actual: Remote.
 ```
 
-### Task / Improvement / New Feature (QA-bound)
-
+Bug, prose:
 ```
-<One sentence: what changes for the user, and why.>
+Summary: Hearth T2: remote sensors not listed on the front panel
 
-### Done when
-- <checkable outcome>        (2-5 bullets)
-
-### How to test
-1. <action>
-2. <action>
-
-**PASS:** <what they see>
-**FAIL:** <what the old behaviour looks like>
-
-### Out of scope                (optional, ≤ 3 bullets, each pointing to a linked ticket)
-- PROJ-1234 …
-
-▸ Dev notes
-- …
+Firmware: 2.8.20260914dev-build512
+When remote sensors are paired they are not shown as options on the front panel. Only the web dashboard lets the user switch to a remote sensor. If the user switches on the dashboard, the front panel does follow the selection.
+Screenshot: attached by reporter.
 ```
 
-### Dev-only todo
-
+Bug with a guess and a workaround:
 ```
-<One sentence: what needs doing.>
+Summary: Hearth app (Android): schedule change does not apply
 
-### Done when
-- …
+Hearth app v3.1.4 (Android), Hearth T2 2.8.20260914dev-build512
+Changing a setpoint in the weekly schedule sometimes does nothing, other times the thermostat restarts but the schedule stays the same. iOS app v3.2.0 works. Probably the app sends the new schedule before the thermostat finished the previous restart.
 
-▸ Dev notes
-- …
+Steps:
+1. Pair the thermostat with the app.
+2. Open Hearth app, thermostat settings, Schedule.
+3. Change Monday 06:00 from 19 to 21 degrees.
+
+Actual: stays at 19, sometimes the thermostat restarts.
+Expected: changes to 21, same as on iOS.
+Workaround: change the setpoint from the front panel.
+Video: attached by reporter.
 ```
 
-**How to test rules**
-- Write numbered actions using the names shown in the product UI (e.g. *Menu > Orders > History*).
-- Name the precondition: which product, which account type, which country, and so on.
-- Give one PASS line and one FAIL line. When the old behaviour is recognisable, FAIL describes it.
-- A shell command belongs here **only** if QA runs it exactly as written, and it is one line.
-- If QA would hit an **expected** behaviour and think it is a bug (e.g. "a recording now splits into `_2` files"), add one bullet on it. Do not add a whole *Traps* / *Not bugs* section.
-
-## 4. Dev notes: the only place for engineering detail
-
-Dev notes is a collapsed block at the bottom of the description (the `▸ Dev notes` line in the markup), so QA never has to scroll past it.
-
-| Allowed | Not allowed, put in the PR instead |
-|---|---|
-| repo + file names (no line numbers, they go stale) | code snippets |
-| suspected cause, 1-3 sentences | shell recipes, probe scripts |
-| candidate fix, 1-2 sentences, plus the one thing to confirm | evidence logs, measurement tables |
-| PR link or branch | dead ends, what you tried |
-| | server IPs |
-
-If a developer really needs the full investigation, attach it as a `.md` file.
-
-## 5. Comments
-
-One comment per event. There are only four kinds:
-
-| Kind | Shape |
-|---|---|
-| **Hand-off to QA** | What they will see, plus `Test on <version or build> or later`. |
-| **Reply to a QA finding** | Acknowledge it, give the cause in product terms in one line, then the version to retest on. *"Version 2.5.333 Orders worked only locally; fixed so it works in dev/stage too. Please retest on v2.5.334 or later."* |
-| **Needs info** | The one question, plus what you need from them (version, video evidence). |
-| **Scope change** | One line. **Also edit the description** so it matches. |
-
-**Do not post:**
-- progress diaries ("investigated X, then Y…"). The Status field already shows progress;
-- "Correcting my previous comment…". **Edit the original** comment or description instead, so no stale result or wrong PR link is left behind to mislead QA;
-- a second copy of anything that is in the description.
-
-## 6. Never put these in visible text
-
-- file paths, line numbers, function, variable or field names
-- code snippets, commit SHAs, branch names, PR numbers (a PR *link* in Dev notes is fine)
-- server internals, state machines
-- root-cause essays, dead ends, "what I tried"
-- a `Status:` header in the body. That is what the Status field is for.
-- server IPs and serials used on your own bench
-- open questions. **File them as their own tickets**, because a question buried in a ticket never gets answered.
-
-## 7. Before you post
-
-Show the draft (summary + body) to the user, then check:
-1. Is the summary ≤ 70 chars and in product language?
-2. Is the visible text ≤ ~120 words, and could a tester act on every line?
-3. For a QA-bound ticket, is there a *How to test* with PASS/FAIL?
-4. Is every ticket you mention written as a key (`PROJ-123`)? The scripts turn keys into links.
-
-Post in the same turn unless the user objects. Report the key and URL.
-
-## 8. Formatting
-
-- Section labels are `###` (H3). Do not use H2, it makes a short ticket look like a long document.
-- Use real lists (`-` and `1.`). Do not type a `-` at the start of a paragraph.
-- Only a tester-run command goes in a code fence.
-- Labels like **Seen on**, **Expected**, **Actual**, **PASS**, **FAIL** are bold, not headings.
-
-## Worked example
-
-**Before.** The ticket had 9 H2 sections: *Root cause · Why it matters · Evidence · Impact · Where the code is (6 file:line anchors) · Proposed fix · Diagnostic recipes (6 shell scripts) · Dead ends · Device state*. About 1,470 words. The summary was `order-manager-server forks ~100 db probes/sec at idle: polling not existing local db that do not exist`.
-
-**After.** 75 words.
-
+Bug with a log line:
 ````
-Summary: Idle order manager spawns ~100 processes/sec on production
+Summary: Hearth T2: history logging stops after switching to Away
 
-Server constantly spawns background processes at idle, wasting CPU.
+2.9.20260918dev-build540
+With history logging to the SD card on, I switched the thermostat from Home to Away while heating was running. Logging stopped, but the LOG icon on the display stayed lit. The file on the card ends at the moment of the switch. Heating continues. Reproduced 5 of 5 times, not on Hearth T1.
 
-**Seen on:** Backend, develop build
-
-### Steps
-1. Boot a server with no local db configured (any dev server or prod) and leave it idle for 5 seconds.
-2. Run:
-
+Log at the moment of the switch:
 ```
-a=$(awk '/^processes/{print $2}' /proc/stat); sleep 10; b=$(awk '/^processes/{print $2}' /proc/stat); echo $(( (b-a)/10 ))
+Sep 18 14:02:11 hearth daemon.err logger[812]: Writer: interval changed mid-file, closing output
 ```
 
-**Expected:** under 5
-**Actual:** 37
-
-▸ Dev notes
-- order-manager-service, index.php: start() opens a db connection for every declared pool entry with a hardcoded localhost address, in a forked process
-- Candidate fix: do not hardcode localhost when another address is configured
+Probably the logger closes the file when the interval changes and does not open a new one.
+Workaround: turn logging off and on after switching modes.
 ````
+
+Task:
+```
+Summary: Show last sync time on the thermostat details page
+
+Currently the last sync time is only visible in the Info tab of the thermostat details page. Please move it next to the thermostat name, larger, with a clock icon.
+Example: attached screenshot.
+```
+
+Task, one line:
+```
+Summary: Rename "Linked Devices" column to "Accessories"
+
+Currently the "Linked Devices" column on the homes list shows "—" for every home, so users think nothing is linked. Please rename the column to "Accessories".
+```
+
+Comments:
+```
+Flipped the default sensor to Built-in on Hearth T2. Will be available on dev build #515.
+```
+```
+2.8.20260916dev-build515
+Factory reset now leaves the sensor on Built-in. Checked with Reset All and Reset Network.
+Closing ticket.
+```
+```
+2.8.20260916dev-build515
+Still reproducible, follow the steps in the description. The sensor shows Remote after Reset All.
+```
