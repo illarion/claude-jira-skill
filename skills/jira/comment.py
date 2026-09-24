@@ -14,7 +14,7 @@ def main():
     text = sys.argv[2]
 
     jira_url, email, token = load_credentials()
-    jira_post(jira_url, email, token, f"/rest/api/3/issue/{issue_key}/comment", {"body": text_to_adf(text)})
+    jira_post(jira_url, email, token, f"/rest/api/3/issue/{issue_key}/comment", {"body": text_to_adf(text, jira_url)})
     print(f"Commented on {issue_key}")
 
 

@@ -1,6 +1,6 @@
 ---
 name: jira
-description: Access Jira to search, summarize, and analyze tickets. Use when the user mentions a Jira ticket key (e.g. PROJ-1234), asks for a team digest, or wants to search/query Jira. Also use when the user wants to create issues, assign tickets, change ticket status, link issues, add comments, update fields, or do anything Jira-related — even if they don't explicitly say "Jira".
+description: Access Jira to search, summarize, and analyze tickets. Use when the user mentions a Jira ticket key (e.g. PROJ-1234), asks for a team digest, or wants to search/query Jira. Also use when the user wants to create issues, assign tickets, change ticket status, link issues, add comments, update fields, or do anything Jira-related — even if they don't explicitly say "Jira". Also use for "file a bug", "write up a ticket", "open a follow-up", "hand this to QA", "reply to QA".
 ---
 
 Subagents (Agent tool) are used for classification tasks during digest reports — always use Sonnet (`model: "sonnet"`) for subagents and run independent ones in parallel.
@@ -9,7 +9,11 @@ All Python scripts referenced below are located in the same directory as this SK
 
 ### IMPORTANT: Jira uses ADF, not wiki markup
 
-Jira Cloud uses ADF (Atlassian Document Format) exclusively. Wiki syntax (`h2.`, `{code}`, `#`, `*bold*`) renders as **literal text**, not formatting. When constructing descriptions, comments, or any content for the Jira API, always use ADF. The Python scripts (`comment.py`, `create.py`, `update.py`) convert plain text to ADF automatically. For rich formatting (headings, code blocks, lists), write raw ADF JSON to a temp file and use `update.py --description-file`. See `references/adf-reference.md` for the ADF structure.
+Jira Cloud uses ADF (Atlassian Document Format) exclusively. Wiki syntax (`h2.`, `{code}`, `*bold*`) renders as **literal text**, not formatting. The Python scripts (`comment.py`, `create.py`, `update.py`) convert **light markup** to ADF automatically: `###` headings, `-` and `1.` lists, ``` code fences, `**bold**`, `` `code` ``, a `▸ Title` line for a collapsed block, and issue keys become links. Raw ADF JSON is still accepted by `--description-file` for nodes the markup does not cover (tables, panels). See `references/adf-reference.md`.
+
+### Writing tickets and comments
+
+Before running `create.py`, `comment.py`, or `update.py` with `--summary` / `--description` / `--description-file`, read `references/writing-style.md` and use its templates. Tickets are read by black-box QA: summary ≤ 70 chars in product language, visible text ≤ ~120 words, engineering detail only inside the collapsed `▸ Dev notes` block, comments ≤ 5 lines. Write the body in light markup to `/tmp/desc.md` and pass `--description-file /tmp/desc.md`. Show the draft (summary + body) in chat, run the checklist from the style guide, then post in the same turn unless the user objects. Report the key and URL.
 
 ### Credentials — DO NOT ACCESS
 
@@ -92,7 +96,7 @@ Returns a JSON array of simplified objects `{key, summary, status, assignee, pri
 ```
 python3 SCRIPT_DIR/comment.py PROJ-123 "This is done"
 ```
-Pass plain text only — the script converts to ADF automatically. Do NOT use wiki markup (`h2.`, `{code}`, `*bold*`) — it will render as literal text in Jira. Output: `Commented on PROJ-123`.
+Pass light markup (plain text, `**bold**`, lists, issue keys become links). Do NOT use wiki markup (`h2.`, `{code}`, `*bold*`) — it will render as literal text in Jira. Keep comments ≤ 5 lines (see `references/writing-style.md`). Output: `Commented on PROJ-123`.
 
 **Transition (change status):**
 ```
@@ -117,15 +121,15 @@ python3 SCRIPT_DIR/link.py PROJ-1 "Blocks" PROJ-2
 
 **Create an issue:**
 ```
-python3 SCRIPT_DIR/create.py PROJ "Fix the login bug" --type Bug --priority High --description-file /tmp/desc.json --assignee "Alice Smith" --fixversion "1.118.2"
+python3 SCRIPT_DIR/create.py PROJ "Record button does nothing" --type Bug --priority High --description-file /tmp/desc.md --assignee "Alice Smith" --fixversion "1.118.2"
 ```
-Default type: `Task`. Returns JSON `{key, url}`. Use `--fixversion` to set the fix version at creation time. For descriptions, always write ADF JSON to a temp file and pass via `--description-file` (see `references/adf-reference.md`). The `--description` flag exists for simple plain text but produces flat paragraphs only — no headings, bold, lists, or code blocks.
+Default type: `Task`. Returns JSON `{key, url}`. Use `--fixversion` to set the fix version at creation time. Write the description in light markup to a temp file and pass it via `--description-file` (raw ADF JSON is also accepted, see `references/adf-reference.md`). `--description` takes the same markup inline; use it only for one-liners. A summary over 70 chars prints a warning to stderr.
 
 **Update an issue:**
 ```
-python3 SCRIPT_DIR/update.py PROJ-123 --priority Major --fixversion "1.118.2" --description-file /tmp/desc.json --assignee "Alice Smith"
+python3 SCRIPT_DIR/update.py PROJ-123 --priority Major --fixversion "1.118.2" --description-file /tmp/desc.md --assignee "Alice Smith"
 ```
-Updates fields on an existing issue. Supports `--summary`, `--priority`, `--description`, `--description-file`, `--fixversion`, `--assignee`. For descriptions, always write ADF JSON to a temp file and pass via `--description-file` (see `references/adf-reference.md`). The `--description` flag exists for simple plain text but produces flat paragraphs only — no headings, bold, lists, or code blocks.
+Updates fields on an existing issue. Supports `--summary`, `--priority`, `--description`, `--description-file`, `--fixversion`, `--assignee`. Write the description in light markup to a temp file and pass it via `--description-file` (raw ADF JSON is also accepted, see `references/adf-reference.md`). `--description` takes the same markup inline; use it only for one-liners. A scope change in a comment must also update the description so the two match.
 
 ### Argument Handling
 

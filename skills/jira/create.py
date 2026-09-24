@@ -4,7 +4,7 @@
 import sys
 import json
 import argparse
-from jira_common import load_credentials, jira_post, text_to_adf, find_user
+from jira_common import load_credentials, jira_post, text_to_adf, load_description, warn_summary, find_user
 
 
 def main():
@@ -13,13 +13,14 @@ def main():
     parser.add_argument("summary", help="Issue summary")
     parser.add_argument("--type", default="Task", help="Issue type (default: Task)")
     parser.add_argument("--priority", help="Priority name (e.g. High)")
-    parser.add_argument("--description", help="Description text")
-    parser.add_argument("--description-file", help="Path to file with raw ADF JSON for description")
+    parser.add_argument("--description", help="Description in light markup (converted to ADF)")
+    parser.add_argument("--description-file", help="Path to a file with light markup or raw ADF JSON for description")
     parser.add_argument("--assignee", help="Assignee display name")
     parser.add_argument("--fixversion", help="Fix version name (e.g. 1.118.2)")
     args = parser.parse_args()
 
     jira_url, email, token = load_credentials()
+    warn_summary(args.summary)
 
     fields = {
         "project": {"key": args.project.upper()},
@@ -31,10 +32,9 @@ def main():
         fields["priority"] = {"name": args.priority}
 
     if args.description_file:
-        with open(args.description_file) as f:
-            fields["description"] = json.load(f)
+        fields["description"] = load_description(args.description_file, jira_url)
     elif args.description:
-        fields["description"] = text_to_adf(args.description)
+        fields["description"] = text_to_adf(args.description, jira_url)
 
     if args.fixversion:
         fields["fixVersions"] = [{"name": args.fixversion}]

@@ -102,6 +102,13 @@ def extract_adf(node, attachment_map=None):
         url = node.get("attrs", {}).get("url", "")
         return url
 
+    if t == "expand":
+        title = node.get("attrs", {}).get("title", "")
+        parts = []
+        for child in node.get("content", []):
+            parts.append(extract_adf(child, attachment_map))
+        return f"\n▸ {title}\n" + "".join(parts)
+
     parts = []
     for child in node.get("content", []):
         parts.append(extract_adf(child, attachment_map))

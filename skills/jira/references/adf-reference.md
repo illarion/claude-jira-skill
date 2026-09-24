@@ -2,32 +2,76 @@
 
 Jira Cloud uses ADF, not wiki markup. Wiki syntax (`h2.`, `{code}`, `#`) will render as literal text.
 
-The `comment.py` and `create.py` scripts wrap plain text in ADF automatically. Use raw ADF only when you need rich formatting (headings, code blocks, bullet lists) via `update.py --description-file`.
+The `comment.py`, `create.py` and `update.py` scripts convert **light markup** to ADF automatically. Write the markup to a file (for example `/tmp/desc.md`) and pass it with `--description-file`. Raw ADF JSON is the fallback for nodes the markup does not cover (tables, panels, mentions).
 
-### ADF Structure
+### Light markup
+
+| Line | ADF |
+|---|---|
+| `# `, `## `, `### ` … | `heading` level 1-6 (use `###` in tickets) |
+| `- item` or `* item` (consecutive lines) | `bulletList` |
+| `1. item`, `2. item` … (consecutive lines) | `orderedList` |
+| ```` ``` ```` … ```` ``` ```` | `codeBlock` (language from the fence, e.g. ```` ```bash ````) |
+| `▸ Title` | `expand` (collapsed block) with that title; everything after it goes inside |
+| blank line | block separator, not emitted |
+| anything else | `paragraph` |
+
+Inline, inside paragraphs, list items and headings:
+
+| Pattern | Mark |
+|---|---|
+| `**text**` | `strong` |
+| `` `text` `` | `code` |
+| `https://…` | `link` |
+| `PROJ-123` | `link` to the issue on the current Jira instance |
+
+Leading whitespace is ignored, so indented template lines are fine. Lists are flat (one level).
+
+Example:
+
+```
+Record button on the storefront does nothing when clicked.
+
+**Seen on:** v2.5.333
+
+### Steps
+1. Open Menu > Orders > History
+2. Click **Record**
+
+**Expected:** a new recording starts
+**Actual:** nothing happens
+
+▸ Dev notes
+- order-service, index.php: start() is never reached; see PROJ-1201
+```
+
+### Raw ADF
+
+`--description-file` accepts raw ADF when the file is a JSON object with `"type": "doc"`. The file holds the **document only**, not a `{"fields": ...}` wrapper.
 
 ```json
 {
-  "fields": {
-    "description": {
-      "version": 1, "type": "doc",
-      "content": [
-        { "type": "heading", "attrs": {"level": 2}, "content": [{"type": "text", "text": "Title"}] },
-        { "type": "paragraph", "content": [
-            {"type": "text", "text": "normal "},
-            {"type": "text", "text": "inline code", "marks": [{"type": "code"}]},
-            {"type": "text", "text": " bold", "marks": [{"type": "strong"}]}
-        ]},
-        { "type": "bulletList", "content": [
-            {"type": "listItem", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "item"}]}]}
-        ]},
-        { "type": "codeBlock", "attrs": {}, "content": [{"type": "text", "text": "code here"}] }
-      ]
-    }
-  }
+  "version": 1, "type": "doc",
+  "content": [
+    { "type": "heading", "attrs": {"level": 3}, "content": [{"type": "text", "text": "Steps"}] },
+    { "type": "orderedList", "content": [
+        {"type": "listItem", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "Open Menu > Orders"}]}]}
+    ]},
+    { "type": "paragraph", "content": [
+        {"type": "text", "text": "Expected:", "marks": [{"type": "strong"}]},
+        {"type": "text", "text": " a new recording starts"}
+    ]},
+    { "type": "bulletList", "content": [
+        {"type": "listItem", "content": [{"type": "paragraph", "content": [{"type": "text", "text": "item"}]}]}
+    ]},
+    { "type": "codeBlock", "attrs": {}, "content": [{"type": "text", "text": "code here"}] },
+    { "type": "expand", "attrs": {"title": "Dev notes"}, "content": [
+        {"type": "paragraph", "content": [{"type": "text", "text": "suspected cause"}]}
+    ]}
+  ]
 }
 ```
 
-For a **comment body**, replace `"fields": {"description": ...}` with `"body": { "version": 1, "type": "doc", "content": [...] }`.
+For a **comment body** sent through `call_api.py`, wrap the same document as `{"body": {...}}`.
 
-Always write ADF JSON to a temp file and pass via `--description-file` (for `create.py` or `update.py`) to avoid shell escaping issues.
+Always write ADF JSON to a temp file and pass it via `--description-file` to avoid shell escaping issues.

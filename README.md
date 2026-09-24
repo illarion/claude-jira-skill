@@ -12,6 +12,7 @@ A Claude Code plugin that provides full Jira integration — fetch tickets, sear
 - **Change status** — transition tickets through workflow states, list available transitions
 - **Link issues** — create relationships between tickets (blocks, relates to, etc.), list available link types
 - **Add comments** — post comments on tickets
+- **Style** — tester-first ticket templates (Bug, Task, Dev-only todo) with word budgets, a collapsed Dev notes block for engineering detail, and light markup that converts to ADF
 - **Team digest** — generate period reports with per-developer stats, workload analysis, and categorized summaries
 - **Image support** — downloads and analyzes image attachments, opens in system viewer on request
 - **Custom API calls** — access any Jira REST endpoint via `call_api.py` for advanced use cases
@@ -65,6 +66,7 @@ You can work with any project your token has access to — just use the project 
 | | `/jira what's overdue in PROJ?` |
 | | `/jira show unassigned tickets in PROJ` |
 | Create an issue | `/jira create a bug in PROJ: "Login page crashes on empty password"` |
+| | `/jira file a bug: the Make order button on the storefront does nothing` |
 | | `/jira create a high priority task in PROJ: "Update API docs", assign to Alice` |
 | Update an issue | `/jira change the priority of PROJ-1234 to High` |
 | | `/jira set fix version of PROJ-1234 to 1.5.0` |
