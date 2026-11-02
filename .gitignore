@@ -1,2 +1,4 @@
-__pycache__/
 .jiraskillrc
+/jira
+/jira.exe
+/dist/

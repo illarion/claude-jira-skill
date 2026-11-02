@@ -2,7 +2,7 @@
 
 Jira Cloud uses ADF, not wiki markup. Wiki syntax (`h2.`, `{code}`, `#`) will render as literal text.
 
-The `comment.py`, `create.py` and `update.py` scripts convert **light markup** to ADF automatically. Write the markup to a file (for example `/tmp/desc.md`) and pass it with `--description-file`. Raw ADF JSON is the fallback for nodes the markup does not cover (tables, panels, mentions).
+The `jira comment`, `jira create` and `jira update` commands convert **light markup** to ADF automatically. Write the markup to a file (for example `/tmp/desc.md`) and pass it with `--description-file`. Raw ADF JSON is the fallback for nodes the markup does not cover (tables, panels, mentions).
 
 ### Light markup
 
@@ -64,6 +64,6 @@ Actual: nothing happens
 }
 ```
 
-For a **comment body** sent through `call_api.py`, wrap the same document as `{"body": {...}}`.
+For a **comment body** sent through `jira call`, wrap the same document as `{"body": {...}}`.
 
 Always write ADF JSON to a temp file and pass it via `--description-file` to avoid shell escaping issues.

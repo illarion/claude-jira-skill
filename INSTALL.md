@@ -21,6 +21,8 @@ ln -s "$(pwd)/claude-jira-skill/skills/jira" ~/.claude/skills/jira
 
 ## Setup
 
+No prerequisites — the skill uses a single prebuilt binary, downloaded automatically to `~/.claude/jira-skill/bin/jira` on first use (Linux, macOS, Windows; amd64 and arm64). If the download is blocked, download `jira-<os>-<arch>` from the [Releases page](https://github.com/illarion/claude-jira-skill/releases) manually, rename it to `jira` (`jira.exe` on Windows) and place it in that directory.
+
 After installing, go to the root of your work folder, start a Claude Code session and do:
 ```
 /jira login

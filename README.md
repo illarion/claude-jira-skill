@@ -15,7 +15,7 @@ A Claude Code plugin that provides full Jira integration — fetch tickets, sear
 - **Style** — tester-first tickets: version first, plain labels, one marked guess, samples to copy, and light markup that converts to ADF
 - **Team digest** — generate period reports with per-developer stats, workload analysis, and categorized summaries
 - **Image support** — downloads and analyzes image attachments, opens in system viewer on request
-- **Custom API calls** — access any Jira REST endpoint via `call_api.py` for advanced use cases
+- **Custom API calls** — access any Jira REST endpoint via `jira call` for advanced use cases
 
 ## Installation
 
@@ -30,7 +30,7 @@ See [INSTALL.md](INSTALL.md) for manual installation options.
 
 ## Prerequisites
 
-- Python 3.8+
+- Nothing to install — the skill downloads a small prebuilt binary on first use (Linux, macOS, Windows; amd64 and arm64)
 - A Jira Cloud or self-hosted Jira instance with API token ([create one here](https://id.atlassian.com/manage-profile/security/api-tokens))
 
 ## Setup
@@ -38,6 +38,8 @@ See [INSTALL.md](INSTALL.md) for manual installation options.
 You'll need a Jira API token. Create one at [id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens).
 
 Then start a Claude Code session and type `/jira login`. The skill will prompt you for your Jira URL, email, and token. Credentials are stored locally in a `.jiraskillrc` file with restricted permissions.
+
+No runtime is required: on first use the skill downloads a prebuilt `jira` binary from the [Releases page](https://github.com/illarion/claude-jira-skill/releases) to `~/.claude/jira-skill/bin/`. If your network blocks GitHub downloads, grab `jira-<os>-<arch>` from the Releases page manually, rename it to `jira` (`jira.exe` on Windows) and place it there.
 
 ### Multiple Jira instances
 
@@ -98,6 +100,7 @@ The [Atlassian Rovo MCP server](https://www.atlassian.com/platform/remote-mcp-se
 | ADF formatting handled for you | No | Yes |
 | Requires admin/OAuth setup | Yes | No |
 | Rate limited by Atlassian plan | Yes | No |
+| Prebuilt binary, no local runtime (Python etc.) | n/a | Yes |
 
 The official MCP is a cloud proxy that requires Atlassian admin to enable Rovo, OAuth 2.1 configuration, and optionally IP allowlisting. This skill runs locally, needs only a personal API token, and works in seconds.
 
