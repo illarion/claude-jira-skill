@@ -19,7 +19,7 @@ const usageText = `Usage: jira <command> [args]
 Commands:
   fetch ISSUE-KEY                                  fetch a ticket with comments and attachments
   search "JQL" [--fields summary,status] [--max N] search issues
-  comment ISSUE-KEY "text"                         add a comment
+  comment ISSUE-KEY "text" | --description-file F  add a comment
   create PROJECT "Summary" [--type Bug] [--priority P]
         [--description markup] [--description-file F] [--assignee "Name"] [--fixversion V]
                                                    create an issue
