@@ -7,14 +7,14 @@ All commands run through one prebuilt binary, `jira` — no Python or other runt
 
 ### Binary
 
-`jira` is cached at `~/.claude/jira-skill/bin/jira` (`jira.exe` on Windows). If it is missing or `<bin> version` fails, download it once:
+`jira` is cached at `~/.claude/jira-skill/bin/jira` (`jira.exe` on Windows). This skill needs version `v2.0.3`. Before the first `jira` command of a session, run `<bin> version`. If the file is missing, the command fails, or it prints another version, download the binary. Keep a binary that prints `dev`: it is a local build.
 
 - Linux/macOS: get OS and arch from `uname -s` and `uname -m` (`Linux`→`linux`, `Darwin`→`darwin`, `x86_64`→`amd64`, `aarch64`/`arm64`→`arm64`), then
-  `curl -Lf --create-dirs -o ~/.claude/jira-skill/bin/jira https://github.com/illarion/claude-jira-skill/releases/latest/download/jira-<os>-<arch> && chmod +x ~/.claude/jira-skill/bin/jira`
+  `curl -Lf --create-dirs -o ~/.claude/jira-skill/bin/jira https://github.com/illarion/claude-jira-skill/releases/download/v2.0.3/jira-<os>-<arch> && chmod +x ~/.claude/jira-skill/bin/jira`
 - Windows: arch is `amd64` or `arm64` (from `$env:PROCESSOR_ARCHITECTURE`); in PowerShell, create `$HOME\.claude\jira-skill\bin` with `New-Item -ItemType Directory -Force`, then
-  `Invoke-WebRequest https://github.com/illarion/claude-jira-skill/releases/latest/download/jira-windows-<arch>.exe -OutFile $HOME\.claude\jira-skill\bin\jira.exe`
+  `Invoke-WebRequest https://github.com/illarion/claude-jira-skill/releases/download/v2.0.3/jira-windows-<arch>.exe -OutFile $HOME\.claude\jira-skill\bin\jira.exe`
 
-Then run `<bin> version` to confirm. If the download fails, tell the user to download the file manually from the Releases page of `illarion/claude-jira-skill` and place it at that path. Below, `jira` means the full path to this binary.
+Then run `<bin> version` to confirm that it prints `v2.0.3`. If the download fails, tell the user to download the file manually from the Releases page of `illarion/claude-jira-skill` and place it at that path. Below, `jira` means the full path to this binary.
 
 ### Credentials
 
