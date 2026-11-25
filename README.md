@@ -4,7 +4,7 @@ A Claude Code plugin that provides full Jira integration — fetch tickets, sear
 
 ## Features
 
-- **Ticket lookup** — fetch full ticket details including description, comments, and image attachments
+- **Ticket lookup** — fetch full ticket details including description, comments, and attachments
 - **JQL search** — search Jira with any JQL query
 - **Create issues** — create new tickets with type, priority, assignee, and fix version
 - **Update issues** — modify summary, description, priority, fix version, assignee
@@ -14,7 +14,7 @@ A Claude Code plugin that provides full Jira integration — fetch tickets, sear
 - **Add comments** — post comments on tickets
 - **Style** — tester-first tickets: version first, plain labels, one marked guess, samples to copy, and light markup that converts to ADF
 - **Team digest** — generate period reports with per-developer stats, workload analysis, and categorized summaries
-- **Image support** — downloads and analyzes image attachments, opens in system viewer on request
+- **Attachments** — downloads and reads attachments (images, PDFs, logs), asks before it downloads a file over 25 MB, opens in system viewer on request
 - **Custom API calls** — access any Jira REST endpoint via `jira call` for advanced use cases
 
 ## Installation
@@ -79,8 +79,9 @@ You can work with any project your token has access to — just use the project 
 | | `/jira what transitions are available for PROJ-1234?` |
 | Link issues | `/jira PROJ-1 blocks PROJ-2` |
 | | `/jira what link types are available?` |
-| Images | `/jira show me the screenshots from PROJ-1234` |
+| Attachments | `/jira show me the screenshots from PROJ-1234` |
 | | `/jira open screenshot 2` |
+| | `/jira what does the log attached to PROJ-1234 say?` |
 | Team digest | `/jira give me a team digest for last week` |
 | | `/jira what did the team do this week?` |
 
@@ -94,7 +95,7 @@ The [Atlassian Rovo MCP server](https://www.atlassian.com/platform/remote-mcp-se
 | Transitions, assignments, linking | No | Yes |
 | Team digest reports | No | Yes |
 | Developer attribution from changelog | No | Yes |
-| Image attachment analysis | No | Yes |
+| Attachment analysis (images, PDFs, logs) | No | Yes |
 | Self-hosted Jira support | No | Yes |
 | Multi-instance auto-switching | No | Yes |
 | ADF formatting handled for you | No | Yes |

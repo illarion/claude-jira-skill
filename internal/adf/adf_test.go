@@ -214,18 +214,56 @@ func TestExtractCodeBlock(t *testing.T) {
 
 func TestExtractMediaWithAttachmentMap(t *testing.T) {
 	node := fromJSON(t, `{"type":"media","attrs":{"alt":"screenshot.png","id":"m1"}}`)
-	byAlt := map[string]string{"screenshot.png": "/tmp/jira-attachments/PROJ-1_screenshot.png"}
+	byAlt := map[string]Attachment{"screenshot.png": {Name: "screenshot.png", Path: "/tmp/jira-attachments/PROJ-1_screenshot.png", Image: true}}
 	want := "\n[IMAGE: screenshot.png -> /tmp/jira-attachments/PROJ-1_screenshot.png]\n"
 	if got := Extract(node, byAlt); got != want {
 		t.Errorf("got %q want %q", got, want)
 	}
-	byID := map[string]string{"m1": "/tmp/x.png"}
-	want2 := "\n[IMAGE: /tmp/x.png]\n"
+	byID := map[string]Attachment{"m1": {Name: "screenshot.png", Path: "/tmp/x.png", Image: true}}
+	want2 := "\n[IMAGE: screenshot.png -> /tmp/x.png]\n"
 	if got := Extract(node, byID); got != want2 {
 		t.Errorf("got %q want %q", got, want2)
 	}
+	noAlt := fromJSON(t, `{"type":"media","attrs":{"id":"m1"}}`)
+	want4 := "\n[IMAGE: /tmp/x.png]\n"
+	if got := Extract(noAlt, byID); got != want4 {
+		t.Errorf("got %q want %q", got, want4)
+	}
 	want3 := "\n[IMAGE: screenshot.png]\n"
 	if got := Extract(node, nil); got != want3 {
+		t.Errorf("got %q want %q", got, want3)
+	}
+}
+
+// Two attachments can have the same file name. The media id tells them
+// apart, so it must win over the name.
+func TestExtractMediaSameFilename(t *testing.T) {
+	first := Attachment{Name: "image.png", Path: "/tmp/PROJ-1_10001_image.png", Image: true}
+	second := Attachment{Name: "image.png", Path: "/tmp/PROJ-1_10002_image.png", Image: true}
+	byBoth := map[string]Attachment{"image.png": first, "m1": first, "m2": second}
+	node := fromJSON(t, `{"type":"media","attrs":{"alt":"image.png","id":"m2"}}`)
+	want := "\n[IMAGE: image.png -> /tmp/PROJ-1_10002_image.png]\n"
+	if got := Extract(node, byBoth); got != want {
+		t.Errorf("got %q want %q", got, want)
+	}
+}
+
+// An attachment that is not an image must not be shown as IMAGE.
+func TestExtractMediaNonImageAttachment(t *testing.T) {
+	node := fromJSON(t, `{"type":"media","attrs":{"alt":"report.pdf","id":"m2"}}`)
+	byAlt := map[string]Attachment{"report.pdf": {Name: "report.pdf", Path: "/tmp/jira-attachments/PROJ-1_report.pdf"}}
+	want := "\n[FILE: report.pdf -> /tmp/jira-attachments/PROJ-1_report.pdf]\n"
+	if got := Extract(node, byAlt); got != want {
+		t.Errorf("got %q want %q", got, want)
+	}
+	byID := map[string]Attachment{"m2": {Name: "report.pdf", Path: "/tmp/x.pdf"}}
+	want2 := "\n[FILE: report.pdf -> /tmp/x.pdf]\n"
+	if got := Extract(node, byID); got != want2 {
+		t.Errorf("got %q want %q", got, want2)
+	}
+	skipped := map[string]Attachment{"m2": {Name: "report.pdf"}}
+	want3 := "\n[FILE: report.pdf (not downloaded)]\n"
+	if got := Extract(node, skipped); got != want3 {
 		t.Errorf("got %q want %q", got, want3)
 	}
 }

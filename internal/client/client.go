@@ -74,11 +74,11 @@ func (c *Client) Request(method, path string, data any) (any, error) {
 	return out, nil
 }
 
-// Download fetches a full URL (an attachment) with a 60s timeout and writes
+// Download fetches a full URL (an attachment) within timeout and writes
 // it to dest. Redirects drop the Authorization header automatically, which
 // is what Jira's signed attachment URLs expect.
-func (c *Client) Download(fullURL, dest string) error {
-	dl := &http.Client{Timeout: 60 * time.Second}
+func (c *Client) Download(fullURL, dest string, timeout time.Duration) error {
+	dl := &http.Client{Timeout: timeout}
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
 		return err

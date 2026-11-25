@@ -104,9 +104,17 @@ func LoadDescription(path, jiraURL string) (map[string]any, error) {
 	return TextToADF(string(b), jiraURL), nil
 }
 
+// Attachment is a ticket attachment as Extract shows it. Path is the local
+// download path; it is empty when the file was not downloaded.
+type Attachment struct {
+	Name  string
+	Path  string
+	Image bool
+}
+
 // Extract renders an ADF node back to readable text (used by fetch).
-// attachmentMap maps attachment filenames / media ids to local download paths.
-func Extract(node any, attachmentMap map[string]string) string {
+// attachmentMap maps attachment filenames / media ids to attachments.
+func Extract(node any, attachmentMap map[string]Attachment) string {
 	m, ok := node.(map[string]any)
 	if !ok {
 		return ""
@@ -136,13 +144,12 @@ func Extract(node any, attachmentMap map[string]string) string {
 		attrs := jx.Obj(m["attrs"])
 		alt := jx.Str(attrs["alt"])
 		mediaID := jx.Str(attrs["id"])
-		if attachmentMap != nil {
-			if p, ok := attachmentMap[alt]; ok && alt != "" {
-				return "\n[IMAGE: " + alt + " -> " + p + "]\n"
-			}
-			if p, ok := attachmentMap[mediaID]; ok && mediaID != "" {
-				return "\n[IMAGE: " + p + "]\n"
-			}
+		// The media id goes first: two attachments can have the same name.
+		if att, ok := attachmentMap[mediaID]; ok && mediaID != "" {
+			return mediaLine(att, alt)
+		}
+		if att, ok := attachmentMap[alt]; ok && alt != "" {
+			return mediaLine(att, alt)
 		}
 		name := alt
 		if name == "" {
@@ -297,4 +304,19 @@ func ensureList(doc *[]any, cur map[string]any, listType, text, jiraURL string, 
 	item := map[string]any{"type": "listItem", "content": []any{paragraph(text, jiraURL)}}
 	cur["content"] = append(cur["content"].([]any), item)
 	return cur
+}
+
+// mediaLine renders a known attachment: IMAGE or FILE, then the local path.
+func mediaLine(att Attachment, alt string) string {
+	label := "FILE"
+	if att.Image {
+		label = "IMAGE"
+	}
+	if att.Path == "" {
+		return "\n[" + label + ": " + att.Name + " (not downloaded)]\n"
+	}
+	if alt == "" {
+		return "\n[" + label + ": " + att.Path + "]\n"
+	}
+	return "\n[" + label + ": " + alt + " -> " + att.Path + "]\n"
 }

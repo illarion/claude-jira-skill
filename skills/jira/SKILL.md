@@ -30,7 +30,7 @@ Before `jira create`, `jira comment` or `jira update` with text, read `reference
 
 ### Commands
 
-- Fetch: `jira fetch PROJ-1234`. Returns summary, description as text, status, assignee, type, versions, comments, attachments; image attachments are downloaded and listed with `local_path`. Present the ticket, then always use the Read tool on every downloaded image: screenshots carry context the text does not. To open one for the user: `xdg-open <local_path>` (Linux), `open` (Mac).
+- Fetch: `jira fetch PROJ-1234`. Returns summary, description as text, status, assignee, type, versions, comments, attachments. Every attachment up to 25 MB is downloaded and listed with `local_path`. Present the ticket, then always use the Read tool on every downloaded image, PDF and text file (logs, JSON, CSV): attachments carry context the text does not. For other types (archives, video) give the user the `local_path`. An attachment with `skipped` is over 25 MB and was not downloaded: tell the user its name and size and ask whether to download it; on yes, run `jira fetch PROJ-1234 --all-attachments`. To open one for the user: `xdg-open <local_path>` (Linux), `open` (Mac).
 - Search: `jira search "<JQL>" --fields summary,status,assignee --max 20`. JSON array `{key, summary, status, assignee, priority}`, default max 50. Common JQL in `references/jql-tips.md`.
 - Comment: `jira comment PROJ-123 --description-file /tmp/desc.md` or `jira comment PROJ-123 "text"`. Exactly one of the two.
 - Transition: `jira transition PROJ-123 --list`, then `jira transition PROJ-123 "In Review"` (case-insensitive).

@@ -6,6 +6,7 @@ import (
 	"os"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/illarion/claude-jira-skill/internal/jx"
 )
@@ -144,7 +145,7 @@ func TestDownload(t *testing.T) {
 	defer srv.Close()
 	c := New(srv.URL, "e", "t")
 	dest := t.TempDir() + "/att.png"
-	if err := c.Download(srv.URL+"/file", dest); err != nil {
+	if err := c.Download(srv.URL+"/file", dest, time.Second); err != nil {
 		t.Fatal(err)
 	}
 	data, err := os.ReadFile(dest)

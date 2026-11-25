@@ -1,11 +1,13 @@
 package commands
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/illarion/claude-jira-skill/internal/adf"
 	"github.com/illarion/claude-jira-skill/internal/jx"
@@ -13,11 +15,16 @@ import (
 
 var unsafeName = regexp.MustCompile(`[^A-Za-z0-9._-]`)
 
+// maxAttachmentBytes is the largest attachment that fetch downloads without
+// --all-attachments.
+const maxAttachmentBytes = 25 << 20
+
 type attachment struct {
 	Filename  string `json:"filename"`
 	MimeType  string `json:"mimeType"`
 	Size      any    `json:"size"`
 	LocalPath any    `json:"local_path"`
+	Skipped   string `json:"skipped,omitempty"`
 }
 
 type comment struct {
@@ -39,13 +46,17 @@ type ticket struct {
 	Comments    []comment    `json:"comments"`
 }
 
-// Fetch prints a ticket as JSON: fields, comments, and image attachments
-// (downloaded, with local_path filled in).
+// Fetch prints a ticket as JSON: fields, comments, and attachments
+// (downloaded, with local_path filled in). An attachment over
+// maxAttachmentBytes is downloaded only with --all-attachments.
 func Fetch(args []string) {
-	if len(args) < 1 {
-		Fail("Usage: jira fetch ISSUE-KEY")
+	fs := flag.NewFlagSet("fetch", flag.ExitOnError)
+	all := fs.Bool("all-attachments", false, "also download attachments over 25 MB")
+	pos := parseFlags(fs, args)
+	if len(pos) < 1 {
+		Fail("Usage: jira fetch ISSUE-KEY [--all-attachments]")
 	}
-	key := strings.ToUpper(args[0])
+	key := strings.ToUpper(pos[0])
 	_, c := start()
 
 	issue := jx.Obj(mustGet(c, "/rest/api/3/issue/"+key+
@@ -58,29 +69,36 @@ func Fetch(args []string) {
 	}
 
 	attachments := []attachment{}
-	attachmentMap := map[string]string{}
+	attachmentMap := map[string]adf.Attachment{}
 	for _, a := range jx.Arr(fields["attachment"]) {
 		att := jx.Obj(a)
+		size, _ := att["size"].(float64)
+		info := adf.Attachment{
+			Name:  jx.Str(att["filename"]),
+			Image: strings.HasPrefix(jx.Str(att["mimeType"]), "image/"),
+		}
 		var localPath any
-		if strings.HasPrefix(jx.Str(att["mimeType"]), "image/") {
-			safe := unsafeName.ReplaceAllString(filepath.Base(jx.Str(att["filename"])), "_")
-			p := filepath.Join(attachmentsDir, key+"_"+safe)
+		skipped := skipReason(size, *all)
+		if skipped == "" {
+			p := attachmentPath(attachmentsDir, key, jx.Str(att["id"]), info.Name)
 			if _, err := os.Stat(p); os.IsNotExist(err) {
-				if err := c.Download(jx.Str(att["content"]), p); err != nil {
+				if err := c.Download(jx.Str(att["content"]), p, downloadTimeout(size)); err != nil {
 					p = "DOWNLOAD_FAILED: " + err.Error()
 				}
 			}
 			localPath = p
-			attachmentMap[jx.Str(att["filename"])] = p
-			if id := jx.Str(att["mediaApiFileId"]); id != "" {
-				attachmentMap[id] = p
-			}
+			info.Path = p
+		}
+		attachmentMap[info.Name] = info
+		if id := jx.Str(att["mediaApiFileId"]); id != "" {
+			attachmentMap[id] = info
 		}
 		attachments = append(attachments, attachment{
-			Filename:  jx.Str(att["filename"]),
+			Filename:  info.Name,
 			MimeType:  jx.Str(att["mimeType"]),
 			Size:      att["size"],
 			LocalPath: localPath,
+			Skipped:   skipped,
 		})
 	}
 
@@ -142,6 +160,31 @@ func Fetch(args []string) {
 		Attachments: attachments,
 		Comments:    comments,
 	})
+}
+
+// attachmentPath returns the local path of an attachment. The attachment id
+// keeps two attachments with the same file name apart.
+func attachmentPath(dir, key, id, filename string) string {
+	safeID := unsafeName.ReplaceAllString(id, "_")
+	safe := unsafeName.ReplaceAllString(filepath.Base(filename), "_")
+	return filepath.Join(dir, key+"_"+safeID+"_"+safe)
+}
+
+// skipReason tells why fetch does not download an attachment of the given
+// size. An empty string means "download it".
+func skipReason(size float64, all bool) string {
+	if all || size <= maxAttachmentBytes {
+		return ""
+	}
+	return fmt.Sprintf("larger than %d MB; run fetch with --all-attachments to download", maxAttachmentBytes>>20)
+}
+
+// downloadTimeout gives a large attachment more time than the default.
+func downloadTimeout(size float64) time.Duration {
+	if size <= maxAttachmentBytes {
+		return 60 * time.Second
+	}
+	return 30 * time.Minute
 }
 
 func cutStr(s string, n int) string {

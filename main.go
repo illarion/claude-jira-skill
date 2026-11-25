@@ -17,7 +17,7 @@ var version = "dev"
 const usageText = `Usage: jira <command> [args]
 
 Commands:
-  fetch ISSUE-KEY                                  fetch a ticket with comments and attachments
+  fetch ISSUE-KEY [--all-attachments]              fetch a ticket with comments and attachments
   search "JQL" [--fields summary,status] [--max N] search issues
   comment ISSUE-KEY "text" | --description-file F  add a comment
   create PROJECT "Summary" [--type Bug] [--priority P]
