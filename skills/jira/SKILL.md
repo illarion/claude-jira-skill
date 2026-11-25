@@ -35,7 +35,7 @@ Before `jira create`, `jira comment` or `jira update` with text, read `reference
 - Comment: `jira comment PROJ-123 --description-file /tmp/desc.md` or `jira comment PROJ-123 "text"`. Exactly one of the two.
 - Transition: `jira transition PROJ-123 --list`, then `jira transition PROJ-123 "In Review"` (case-insensitive).
 - Assign: `jira assign PROJ-123 "Alice Smith"` or `--unassign`.
-- Link: `jira link --list`; `jira link PROJ-1 "Blocks" PROJ-2` (first key is the outward side).
+- Link: `jira link --list`; `jira link PROJ-1 "Blocks" PROJ-2` means "PROJ-1 blocks PROJ-2": the first key gets the `outward` phrase of the type. For the `inward` phrase ("PROJ-1 is blocked by PROJ-2"), swap the keys.
 - Create: `jira create PROJ "Summary" --type Bug --description-file /tmp/desc.md [--priority P] [--assignee "Name"] [--fixversion "1.2"]`. Default type Task. Returns `{key, url}`. A summary over 70 chars prints a warning.
 - Update: `jira update PROJ-123 [--summary ...] [--description-file ...] [--priority ...] [--fixversion ...] [--assignee ...]`.
 - Anything else: `jira call GET|POST|PUT|DELETE /rest/api/3/... [--data '{...}']`. Jira v3 search paginates with `nextPageToken`/`isLast`, not `startAt`.

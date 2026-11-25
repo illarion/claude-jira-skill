@@ -13,7 +13,7 @@ type linkType struct {
 	Outward string `json:"outward"`
 }
 
-// Link lists link types or links two issues (first key is the outward side).
+// Link lists link types or links two issues: "ISSUE-1 <outward phrase> ISSUE-2".
 func Link(args []string) {
 	if len(args) == 1 && args[0] == "--list" {
 		_, c := start()
@@ -59,12 +59,18 @@ func Link(args []string) {
 		Fail("No link type matching \"%s\". Available: %s", typeName, strings.Join(names, ", "))
 	}
 
-	if _, err := c.Post("/rest/api/3/issueLink", map[string]any{
-		"type":         map[string]any{"name": jx.Str(match["name"])},
-		"outwardIssue": map[string]any{"key": source},
-		"inwardIssue":  map[string]any{"key": target},
-	}); err != nil {
+	if _, err := c.Post("/rest/api/3/issueLink", linkBody(jx.Str(match["name"]), source, target)); err != nil {
 		die(err)
 	}
 	fmt.Printf("%s %s %s\n", source, jx.Str(match["outward"]), target)
+}
+
+// linkBody builds the issueLink payload for "source <outward phrase> target".
+// Jira shows the outward phrase on the issue sent as inwardIssue.
+func linkBody(typeName, source, target string) map[string]any {
+	return map[string]any{
+		"type":         map[string]any{"name": typeName},
+		"inwardIssue":  map[string]any{"key": source},
+		"outwardIssue": map[string]any{"key": target},
+	}
 }
